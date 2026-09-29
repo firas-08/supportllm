@@ -1,0 +1,15 @@
+# Environnements virtuels 
+venv/
+
+#Caches Python 
+__pycache__
+
+# Données
+data/raw/
+data/processed/
+
+# Modèles / checkpoints 
+models/
+
+# Secrets / config locale
+.env
