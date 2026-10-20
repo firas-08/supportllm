@@ -1,15 +1,19 @@
 # Environnements virtuels 
 venv/
 
-#Caches Python 
-__pycache__
+#Caches Python
+__pycache__/
+**/__pycache__/
 
 # Données
 data/raw/
 data/processed/
 
-# Modèles / checkpoints 
+# Modèles / checkpoints
 models/
+
+# Résultats d'expériences (régénérables via baseline.py / train.py)
+experiments/
 
 # Secrets / config locale
 .env

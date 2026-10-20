@@ -10,10 +10,19 @@ dependencies = [
     "datasets (>=5.0.1,<6.0.0)",
     "pandas (>=3.0.6,<4.0.0)",
     "scikit-learn (>=1.9.1,<2.0.0)",
-    "rouge-score (>=0.1.2,<0.2.0)"
+    "rouge-score (>=0.1.2,<0.2.0)",
+    "sentence-transformers (>=6.1.0,<7.0.0)",
+    "peft (>=0.21.2,<0.22.0)",
+    "trl (>=1.15.0,<2.0.0)",
+    "bitsandbytes (>=0.50.2,<0.51.0)"
 ]
 
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "ipykernel (>=7.4.0,<8.0.0)"
+]
