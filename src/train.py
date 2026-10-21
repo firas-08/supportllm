@@ -58,7 +58,7 @@ def get_conversations(df : pd.DataFrame) -> list[list[dict]]:
 
 def get_quantized_model(model=MODEL) -> tuple[peft.PeftModel, transformers.PreTrainedTokenizer]:
     """ Charger le model en quantization 4-bits (QLoRA) """
-    bnb_config = transformers.BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.bfloat16)
+    bnb_config = transformers.BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.loat16)
     model_quant = transformers.AutoModelForCausalLM.from_pretrained(model, quantization_config=bnb_config)
     model_quant = peft.prepare_model_for_kbit_training(model_quant)
     lora_config = peft.LoraConfig(r=16, lora_alpha=32,
@@ -81,13 +81,14 @@ def train(conversations : list[list[dict]], model_quantized:peft.PeftModel, toke
     dataset = datasets.Dataset.from_dict({"messages": conversations})
     sft_config = trl.SFTConfig(
         output_dir=str(chemin),
-        use_cpu=True,
         num_train_epochs=3,
         per_device_train_batch_size=4,
         logging_steps=5,
         save_strategy="steps",
         save_steps=20,
         save_total_limit=2,
+        bf16=False,
+        fp16=True,
     )
     trainer = trl.SFTTrainer(
         model_quantized,
