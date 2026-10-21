@@ -59,13 +59,18 @@ def get_conversations(df : pd.DataFrame) -> list[list[dict]]:
 def get_quantized_model(model=MODEL) -> tuple[peft.PeftModel, transformers.PreTrainedTokenizer]:
     """ Charger le model en quantization 4-bits (QLoRA) """
     bnb_config = transformers.BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16)
-    model_quant = transformers.AutoModelForCausalLM.from_pretrained(model, quantization_config=bnb_config)
+    model_quant = transformers.AutoModelForCausalLM.from_pretrained(model, quantization_config=bnb_config, dtype=torch.float16)
     model_quant = peft.prepare_model_for_kbit_training(model_quant)
     lora_config = peft.LoraConfig(r=16, lora_alpha=32,
                                   target_modules=["q_proj", "v_proj"],
                                   lora_dropout=0.05,
                                   task_type="CAUSAL_LM")
     ready_model = peft.get_peft_model(model_quant, lora_config)
+    for p in ready_model.parameters():
+        if p.requires_grad:
+            p.data = p.data.float()
+    logger.info("dtypes entraînables : %s", {p.dtype for p in ready_model.parameters() if p.requires_grad})
+
     tokenizer = transformers.AutoTokenizer.from_pretrained(model)
     return ready_model, tokenizer
 
