@@ -94,6 +94,7 @@ def train(conversations : list[list[dict]], model_quantized:peft.PeftModel, toke
         save_total_limit=2,
         bf16=False,
         fp16=True,
+        max_steps=10,
     )
     trainer = trl.SFTTrainer(
         model_quantized,
@@ -101,6 +102,13 @@ def train(conversations : list[list[dict]], model_quantized:peft.PeftModel, toke
         train_dataset=dataset,
         processing_class=tokenizer,
     )
+
+    # SFTTrainer force les paramètres LoRA en bf16 pour tout modèle quantisé ;
+    # le GradScaler fp16 les refuse, donc on les repasse en fp32 avant train().
+    for p in model_quantized.parameters():
+        if p.requires_grad:
+            p.data = p.data.float()
+    logger.info("dtypes entraînables : %s", {p.dtype for p in model_quantized.parameters() if p.requires_grad})
 
     checkpoint_existant = transformers.trainer_utils.get_last_checkpoint(str(chemin))
     if checkpoint_existant:
