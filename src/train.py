@@ -94,7 +94,6 @@ def train(conversations : list[list[dict]], model_quantized:peft.PeftModel, toke
         save_total_limit=2,
         bf16=False,
         fp16=True,
-        max_steps=10,
     )
     trainer = trl.SFTTrainer(
         model_quantized,
